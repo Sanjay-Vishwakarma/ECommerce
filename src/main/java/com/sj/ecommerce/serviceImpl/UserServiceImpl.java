@@ -1,0 +1,129 @@
+package com.sj.ecommerce.serviceImpl;
+
+import com.sj.ecommerce.common.Function;
+import com.sj.ecommerce.reponse.Response;
+import com.sj.ecommerce.dto.UserDto;
+import com.sj.ecommerce.entity.User;
+import com.sj.ecommerce.repository.UserRepository;
+import com.sj.ecommerce.service.UserService;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    Response<UserDto> response = new Response<>();
+
+
+    @Override
+    public Response<UserDto> saveUser(UserDto userDto) {
+        try {
+            User user = modelMapper.map(userDto, User.class);
+            user.setRoles("user");
+            user.setCreatedAt(LocalDateTime.now());
+            user.setPassword(Function.generatePassword());
+            userRepository.save(user);
+            response.setMessage("User created successfully.");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return response;
+    }
+
+    @Override
+    public Response<UserDto> getUserProfile(String id) {
+        try {
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+            UserDto map = modelMapper.map(user, UserDto.class);
+            response.setData(map);
+            response.setMessage("User profile successfully retrieved.");
+            return response;
+        } catch (Exception e) {
+            response.setMessage("Error getting profile: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+    @Override
+    public Response<UserDto> updateUserProfile(String id, UserDto userDTO) {
+        Response<UserDto> response = new Response<>(); // Initialize response object locally
+        try {
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+            modelMapper.map(userDTO, user);
+            user.setUpdatedAt(LocalDateTime.now());
+            User saved = userRepository.save(user);
+            response.setData(modelMapper.map(saved, UserDto.class));
+            response.setMessage("User profile successfully updated.");
+        } catch (Exception e) {
+            response.setMessage("Error updating profile: " + e.getMessage());
+            throw new RuntimeException("Error updating profile", e);
+        }
+
+        return response;
+    }
+
+    @Override
+    public Response<List<UserDto>> getAllUsers() {
+        Response<List<UserDto>> response = new Response<>();
+        try {
+            List<User> allUsers = userRepository.findAll();
+
+            // Map User entities to UserDto objects
+            List<UserDto> userDtos = allUsers.stream()
+                    .map(user -> modelMapper.map(user, UserDto.class)) // Example mapping
+                    .collect(Collectors.toList());
+
+            response.setData(userDtos);  // Set data in response
+            response.setStatus("success");
+            response.setMessage("Users fetched successfully.");
+
+        } catch (Exception e) {
+            e.printStackTrace();  // Log the error (ideally use a logger instead)
+            response.setStatus("error");
+            response.setMessage("An error occurred while fetching users.");
+        }
+        return response;
+    }
+
+    @Override
+    public Response<String> deleteUser(String userId) {
+        Response<String> response = new Response<>();
+        try {
+            // Check if the user exists
+            if (userRepository.existsById(userId)) {
+                userRepository.deleteById(userId);
+
+                response.setStatus("success");
+                response.setMessage("User deleted successfully.");
+                response.setData(null); // No additional data to return
+            } else {
+                response.setStatus("error");
+                response.setMessage("User not found.");
+                response.setData(null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // Use a proper logger in production
+            response.setStatus("error");
+            response.setMessage("An error occurred while deleting the user.");
+            response.setData(null);
+        }
+        return response;
+    }
+
+
+}
