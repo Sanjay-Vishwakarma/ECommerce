@@ -1,5 +1,10 @@
 package com.sj.ecommerce.reponse;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
+
+@Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Response<T> {
 
     private T data;
@@ -7,22 +12,12 @@ public class Response<T> {
     private String message;
     private String status;
 
-
-
     public T getData() {
         return data;
     }
 
     public void setData(T data) {
         this.data = data;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 
     public String getCode() {
@@ -33,11 +28,20 @@ public class Response<T> {
         this.code = code;
     }
 
-    public void setStatus(String success) {
-        this.status = status;
+    public String getMessage() {
+        return message;
     }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     public String getStatus() {
         return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
 

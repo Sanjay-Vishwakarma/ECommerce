@@ -8,7 +8,7 @@ public interface CartService {
 
     Response<CartDto> getCart(String userId);
 
-    Response<CartDto> updateCartProductQuantity(Long productId, Integer quantity);
+    Response<CartDto> updateCartProductQuantity(String productId, Integer quantity);
 
     Response<String> removeFromCart(String userId, String productId) ;
 }

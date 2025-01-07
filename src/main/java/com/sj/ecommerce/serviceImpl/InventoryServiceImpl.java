@@ -9,7 +9,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class InventoryServiceImpl implements InventoryService {
@@ -87,6 +89,32 @@ public class InventoryServiceImpl implements InventoryService {
             response.setStatus("error");
         }
 
+        return response;
+    }
+
+    @Override
+    public Response<List<InventoryDto>> getAllInventory() {
+        Response<List<InventoryDto>> response = new Response<>();
+
+        try {
+            List<Inventory> inventoryList = inventoryRepository.findAll(); // Fetch all inventory items
+
+            // Convert Inventory list to InventoryDto list
+            List<InventoryDto> inventoryDtoList = inventoryList.stream()
+                    .map(inventory -> modelMapper.map(inventory, InventoryDto.class))
+                    .collect(Collectors.toList());
+
+            response.setData(inventoryDtoList);
+            response.setCode("200");
+            response.setMessage("Inventory fetched successfully");
+            response.setStatus("success");
+
+        } catch (Exception e) {
+            response.setData(null);
+            response.setCode("500");
+            response.setMessage("Error fetching inventory: " + e.getMessage());
+            response.setStatus("error");
+        }
         return response;
     }
 }

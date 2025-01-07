@@ -82,6 +82,15 @@ public class Order {
         private String productId; // Reference to Product
         private Integer quantity;
         private Double totalPrice; // Price at the time of order
+        private String productName;
+
+        public String getProductName() {
+            return productName;
+        }
+
+        public void setProductName(String productName) {
+            this.productName = productName;
+        }
 
         public Double getTotalPrice() {
             return totalPrice;

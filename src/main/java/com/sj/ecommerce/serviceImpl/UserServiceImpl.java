@@ -29,18 +29,42 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Response<UserDto> saveUser(UserDto userDto) {
+        Response<UserDto> response = new Response<>();
+        if (userDto == null) {
+            response.setCode("UF0000");
+            response.setStatus("Failure");
+            response.setMessage("User details should not be null");
+            return response;
+        }
         try {
+            // Check if the user already exists
+            Optional<User> existingUser = userRepository.findByEmail(userDto.getEmail());
+            if (existingUser.isPresent()) {
+                response.setCode("UF0001");
+                response.setStatus("Failure");
+                response.setMessage("User already exists.");
+                return response;
+            }
+            // Map DTO to entity and save the new user
             User user = modelMapper.map(userDto, User.class);
             user.setRoles("user");
             user.setCreatedAt(LocalDateTime.now());
             user.setPassword(Function.generatePassword());
             userRepository.save(user);
+
+            response.setCode("US0000");
+            response.setStatus("Success");
             response.setMessage("User created successfully.");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            response.setCode("UE0000");
+            response.setStatus("Failure");
+            response.setMessage("An error occurred while saving the user.");
+            // Optionally log the exception
+            e.printStackTrace();
         }
         return response;
     }
+
 
     @Override
     public Response<UserDto> getUserProfile(String id) {

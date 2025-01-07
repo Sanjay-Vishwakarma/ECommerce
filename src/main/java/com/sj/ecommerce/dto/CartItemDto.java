@@ -1,6 +1,10 @@
 package com.sj.ecommerce.dto;
 
+import lombok.Data;
+
+@Data
 public class CartItemDto {
+
     private String productId;
     private String productName;
     private Integer quantity;

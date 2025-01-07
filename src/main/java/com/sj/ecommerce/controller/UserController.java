@@ -48,15 +48,15 @@ public class UserController {
     }
 
     // 3. Get User Profile
-    @GetMapping("/profile/{id}")
-    public Response<UserDto> getUserProfile(@PathVariable String id) {
-        return userService.getUserProfile(id);
+    @GetMapping("/profile/{getUserById}")
+    public Response<UserDto> getUserProfile(@PathVariable String getUserById) {
+        return userService.getUserProfile(getUserById);
     }
 
     // 4. Update User Profile
-    @PutMapping("/profile/{id}")
-    public Response<UserDto> updateUserProfile(@PathVariable String id, @RequestBody UserDto userDTO) {
-        return  userService.updateUserProfile(id, userDTO);
+    @PutMapping("/profile/update/{getUserById}")
+    public Response<UserDto> updateUserProfile(@PathVariable String getUserById, @RequestBody UserDto userDTO) {
+        return  userService.updateUserProfile(getUserById, userDTO);
     }
 
     // 5. Get All Products
@@ -78,31 +78,30 @@ public class UserController {
     }
 
     // 8. Get Cart
-    @GetMapping("/cart/{userId}")
+    @GetMapping("/cart/getCart/{userId}")
     public Response<CartDto> getCart(@PathVariable String userId) {
         return cartService.getCart(userId);
     }
 
     // 9. Update Product Quantity in Cart
-    @PutMapping("/cart/{productId}")
+    @PutMapping("/cart/update/{productId}")
     public Response<CartDto> updateCartProductQuantity(
-            @PathVariable Long productId, @RequestBody CartDto request) {
+            @PathVariable String productId, @RequestBody CartDto request) {
         Response<CartDto> response = new Response<>();
-        if (request.getItems() == null || request.getItems().isEmpty()) {
+        if (request.getCartItems() == null || request.getCartItems().isEmpty()) {
             response.setMessage("No items found");
             return response;
         }
-        Integer quantity = request.getItems().getFirst().getQuantity();
+        Integer quantity = request.getCartItems().getFirst().getQuantity();
         return cartService.updateCartProductQuantity(productId, quantity);
     }
 
     // 10. Remove Product from Cart
-    @DeleteMapping("/cart/{productId}")
+    @DeleteMapping("/cart/delete/{productId}")
     public ResponseEntity<Response<String>> removeFromCart(@PathVariable String productId, @RequestParam String userId) {
         try {
             // Call the service layer to remove the product from the cart
             Response<String> response = cartService.removeFromCart(userId, productId);
-
             // Return success response
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
@@ -116,7 +115,7 @@ public class UserController {
     }
 
     // 11. Place Order
-    @PostMapping("/orders")
+    @PostMapping("/orders/placeOrder")
     public ResponseEntity<Response<OrderDto>> placeOrder(@RequestParam String userId) {
         try {
             // Call the service layer to place the order
@@ -146,6 +145,11 @@ public class UserController {
         return orderService.getOrderById(getOrderById);
     }
 
+    //14. Get All Users
+    @GetMapping("/getAllUsers")
+    Response<List<UserDto>> getAllUsers() {
+        return userService.getAllUsers();
+    }
 
 
 }

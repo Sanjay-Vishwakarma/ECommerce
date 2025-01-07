@@ -46,7 +46,7 @@ public class AdminController {
         return userService.getUserProfile(userId);
     }
 
-    @DeleteMapping("/users/{userId}")
+    @DeleteMapping("/users/delete/{userId}")
     Response<String> deleteUser(@PathVariable String userId) {
         return userService.deleteUser(userId);
     }
@@ -85,7 +85,7 @@ public class AdminController {
     }
 
     // Update product details
-    @PutMapping("/products/{productId}")
+    @PutMapping("/products/update/{productId}")
     public Response<ProductDto> updateProduct(
             @PathVariable String productId,
             @RequestBody ProductDto productDto) {
@@ -93,7 +93,7 @@ public class AdminController {
     }
 
     // Delete a product
-    @DeleteMapping("/products/{productId}")
+    @DeleteMapping("/products/delete/{productId}")
     public Response<String> deleteProduct(@PathVariable String productId) {
         return productService.deleteProduct(productId);
     }
@@ -111,13 +111,13 @@ public class AdminController {
     }
 
     // Update order status
-    @PutMapping("/orders/{orderId}")
+    @PutMapping("/orders/update/{orderId}")
     public Response<OrderDto> updateOrderStatus(@PathVariable String orderId, @RequestParam String status) {
         return orderService.updateOrderStatus(orderId, status);
     }
 
     // Delete an order
-    @DeleteMapping("/orders/{orderId}")
+    @DeleteMapping("/orders/delete/{orderId}")
     public Response<String> deleteOrder(@PathVariable String orderId) {
        return orderService.deleteOrder(orderId);
     }
@@ -135,7 +135,7 @@ public class AdminController {
     }
 
     // Update inventory stock
-    @PutMapping("/inventory/{productId}")
+    @PutMapping("/inventory/update/{productId}")
     public Response<InventoryDto> updateInventoryStock(
             @PathVariable String productId, @RequestBody InventoryDto inventoryDto) {
        return inventoryService.updateInventoryStock(productId, inventoryDto);
@@ -143,9 +143,16 @@ public class AdminController {
     }
 
     // Delete inventory
-    @DeleteMapping("/inventory/{productId}")
+    @DeleteMapping("/inventory/delete/{productId}")
     public Response<String> deleteInventory(@PathVariable String productId) {
         return inventoryService.deleteInventory(productId);
+    }
+
+    // get all inventory
+
+    @GetMapping("/inventory/getAllInventory")
+    public Response<List<InventoryDto>> getAllInventory() {
+        return inventoryService.getAllInventory();
     }
 
     /*

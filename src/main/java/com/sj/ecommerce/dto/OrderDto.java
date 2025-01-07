@@ -2,6 +2,7 @@ package com.sj.ecommerce.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -9,11 +10,27 @@ import java.util.List;
 public class OrderDto {
     private String id;
     private String userId; // Reference to User
-    private List<OrderItemDto> items;
+    private List<OrderItemDto> orderItemDto;
     private Double totalAmount;
     private String paymentId; // Reference to Payment
     private String status; // e.g., "PENDING", "SHIPPED", "DELIVERED"
-    private Date orderDate;
+    private LocalDateTime orderDate;
+
+    public LocalDateTime getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(LocalDateTime orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public List<OrderItemDto> getOrderItemDto() {
+        return orderItemDto;
+    }
+
+    public void setOrderItemDto(List<OrderItemDto> orderItemDto) {
+        this.orderItemDto = orderItemDto;
+    }
 
     public String getId() {
         return id;
@@ -31,13 +48,6 @@ public class OrderDto {
         this.userId = userId;
     }
 
-    public List<OrderItemDto> getItems() {
-        return items;
-    }
-
-    public void setItems(List<OrderItemDto> items) {
-        this.items = items;
-    }
 
     public Double getTotalAmount() {
         return totalAmount;
@@ -63,13 +73,6 @@ public class OrderDto {
         this.status = status;
     }
 
-    public Date getOrderDate() {
-        return orderDate;
-    }
-
-    public void setOrderDate(Date orderDate) {
-        this.orderDate = orderDate;
-    }
 
 
 }

@@ -2,6 +2,7 @@ package com.sj.ecommerce.serviceImpl;
 
 import com.sj.ecommerce.dto.CartDto;
 import com.sj.ecommerce.dto.OrderDto;
+import com.sj.ecommerce.dto.OrderItemDto;
 import com.sj.ecommerce.entity.Cart;
 import com.sj.ecommerce.reponse.Response;
 import com.sj.ecommerce.repository.CartRepository;
@@ -91,11 +92,13 @@ public class OrderServiceImpl implements OrderService {
         return response;
     }
 
+
     @Override
     public Response<OrderDto> placeOrder(String userId) {
         // Fetch the user's cart
         CartDto byUserId = cartRepository.findByUserId(userId);
-        Cart cart = modelMapper.map(byUserId, Cart.class);
+        System.out.println("byUserId = " + byUserId);
+        Cart cart = modelMapper.map(byUserId, Cart.class); // // Fetch the user's cart
         if (cart == null || cart.getCartItems().isEmpty()) {
             throw new IllegalArgumentException("Cart is empty or does not exist for user: " + userId);
         }
@@ -105,18 +108,19 @@ public class OrderServiceImpl implements OrderService {
                 .mapToDouble(item -> item.getQuantity() * item.getProductPrice())
                 .sum();
 
-        // Convert CartItems to OrderItems
+        // Convert CartItems to OrderItems and map to OrderItemDto
         List<Order.OrderItem> orderItems = cart.getCartItems().stream()
                 .map(cartItem -> {
                     Order.OrderItem orderItem = new Order.OrderItem();
                     orderItem.setProductId(cartItem.getProductId());
+                    orderItem.setProductName(cartItem.getProductName());  // Ensure the name is copied
                     orderItem.setQuantity(cartItem.getQuantity());
                     orderItem.setTotalPrice(cartItem.getQuantity() * cartItem.getProductPrice());
                     return orderItem;
                 })
                 .toList();
 
-
+        // Create the Order object
         Order order = new Order();
         order.setUserId(userId);
         order.setOrderItems(orderItems);
@@ -124,13 +128,25 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderDate(LocalDateTime.now());
         order.setStatus("PLACED");
 
+        // Save the order
         Order savedOrder = orderRepository.save(order);
 
         // Clear the cart after placing the order
-        cartRepository.delete(cart);
+        cartRepository.delete(cart); // // Delete only this specific cart
 
         // Map the saved order to DTO
         OrderDto orderDto = modelMapper.map(savedOrder, OrderDto.class);
+
+        // Set orderItems in OrderDto from the Order
+        orderDto.setOrderItemDto(savedOrder.getOrderItems().stream()
+                .map(orderItem -> {
+                    OrderItemDto itemDto = new OrderItemDto();
+                    itemDto.setProductId(orderItem.getProductId());
+                    itemDto.setProductName(orderItem.getProductName());  // Ensure the name is set
+                    itemDto.setQuantity(orderItem.getQuantity());
+                    itemDto.setTotalPrice(orderItem.getTotalPrice());
+                    return itemDto;
+                }).collect(Collectors.toList()));
 
         // Return the response
         Response<OrderDto> response = new Response<>();
@@ -141,13 +157,40 @@ public class OrderServiceImpl implements OrderService {
         return response;
     }
 
+
     @Override
     public Response<List<OrderDto>> getOrderHistory(String userId) {
         // Fetch orders for the specific user
         List<Order> orders = orderRepository.findByUserId(userId);
-        // Map the Order entities to OrderDTOs using ModelMapper
+
+        // Manually map the Order entities to OrderDto
         List<OrderDto> orderDtos = orders.stream()
-                .map(order -> modelMapper.map(order, OrderDto.class))
+                .map(order -> {
+                    // Map the Order entity to OrderDto using ModelMapper
+                    OrderDto orderDto = modelMapper.map(order, OrderDto.class);
+
+                    // Manually map orderItems to orderItemDto
+                    List<OrderItemDto> orderItemDtos = order.getOrderItems().stream()
+                            .map(orderItem -> {
+                                OrderItemDto itemDto = new OrderItemDto();
+                                itemDto.setProductId(orderItem.getProductId());
+                                itemDto.setProductName(orderItem.getProductName());
+                                itemDto.setQuantity(orderItem.getQuantity());
+                                itemDto.setTotalPrice(orderItem.getTotalPrice());
+                                return itemDto;
+                            })
+                            .collect(Collectors.toList());
+
+                    // Set the orderItems in the orderDto
+                    orderDto.setOrderItemDto(orderItemDtos);
+
+                    // Set the orderDate
+                    if (order.getOrderDate() != null) {
+                        orderDto.setOrderDate(order.getOrderDate());
+                    }
+
+                    return orderDto;
+                })
                 .collect(Collectors.toList());
 
         // Create a Response object and set the data
@@ -160,8 +203,10 @@ public class OrderServiceImpl implements OrderService {
         return response;
     }
 
+
     @Override
     public Response<OrderDto> getOrderById(String orderId) {
+        Response<OrderDto> response = new Response<>();
         try {
             // Fetch the Order entity by its ID
             Optional<Order> orderOptional = orderRepository.findById(orderId);
@@ -173,34 +218,46 @@ public class OrderServiceImpl implements OrderService {
                 // Map the Order entity to OrderDto using ModelMapper
                 OrderDto orderDto = modelMapper.map(order, OrderDto.class);
 
-                // Create and return a successful response
-                Response<OrderDto> response = new Response<>();
+                // Manually map the order items
+                List<OrderItemDto> orderItemDtos = order.getOrderItems().stream()
+                        .map(orderItem -> {
+                            OrderItemDto itemDto = new OrderItemDto();
+                            itemDto.setProductId(orderItem.getProductId());
+                            itemDto.setProductName(orderItem.getProductName());
+                            itemDto.setQuantity(orderItem.getQuantity());
+                            itemDto.setTotalPrice(orderItem.getTotalPrice());
+                            return itemDto;
+                        })
+                        .collect(Collectors.toList());
+
+                // Set order items in the DTO
+                orderDto.setOrderItemDto(orderItemDtos);
+
+                // Set order date if not null
+                orderDto.setOrderDate(order.getOrderDate());
+
+                // Set response data
                 response.setData(orderDto);
-                response.setCode("200");  // Appropriate success code
+                response.setCode("200");  // Success code
                 response.setMessage("Order fetched successfully");
                 response.setStatus("SUCCESS");
 
-                return response;
             } else {
                 // Handle the case where the Order is not found
-                Response<OrderDto> response = new Response<>();
                 response.setData(null);
                 response.setCode("404");  // Not Found code
                 response.setMessage("Order not found");
                 response.setStatus("ERROR");
-
-                return response;
             }
         } catch (Exception e) {
             // Handle exceptions and return a generic error response
-            Response<OrderDto> response = new Response<>();
             response.setData(null);
             response.setCode("500");  // Internal Server Error
             response.setMessage("An error occurred while fetching the order: " + e.getMessage());
             response.setStatus("ERROR");
-
-            return response;
         }
+
+        return response;
     }
 
 

@@ -54,11 +54,12 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Response<CartDto> updateCartProductQuantity(Long productId, Integer quantity) {
+    public Response<CartDto> updateCartProductQuantity(String productId, Integer quantity) {
         Response<CartDto> response = new Response<>();
         try {
             // Fetch the cart associated with the user (modify as needed for your logic)
             CartDto cartDto = cartRepository.findByProductId(productId);
+            System.out.println("cartDto = " + cartDto);
             Cart cart = modelMapper.map(cartDto, Cart.class);
 
             if (cart == null) {
