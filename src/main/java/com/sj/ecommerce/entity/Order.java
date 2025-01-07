@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Document(collection = "orders")
@@ -12,10 +13,27 @@ public class Order {
     @Id
     private String id;
     private String userId; // Reference to User
-    private List<OrderItem> items; // Embedded documents
+    private List<OrderItem> orderItems; // Embedded documents
     private Double totalAmount;
     private String paymentId; // Reference to Payment
     private String status; // e.g., "PENDING", "SHIPPED", "DELIVERED"
+    private LocalDateTime orderDate;
+
+    public LocalDateTime getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(LocalDateTime orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
+    }
 
     public String getId() {
         return id;
@@ -33,13 +51,6 @@ public class Order {
         this.userId = userId;
     }
 
-    public List<OrderItem> getItems() {
-        return items;
-    }
-
-    public void setItems(List<OrderItem> items) {
-        this.items = items;
-    }
 
     public Double getTotalAmount() {
         return totalAmount;
@@ -67,9 +78,18 @@ public class Order {
 
     @Data
     public static class OrderItem {
+
         private String productId; // Reference to Product
         private Integer quantity;
-        private Double price; // Price at the time of order
+        private Double totalPrice; // Price at the time of order
+
+        public Double getTotalPrice() {
+            return totalPrice;
+        }
+
+        public void setTotalPrice(Double totalPrice) {
+            this.totalPrice = totalPrice;
+        }
 
         public String getProductId() {
             return productId;
@@ -87,12 +107,6 @@ public class Order {
             this.quantity = quantity;
         }
 
-        public Double getPrice() {
-            return price;
-        }
 
-        public void setPrice(Double price) {
-            this.price = price;
-        }
     }
 }

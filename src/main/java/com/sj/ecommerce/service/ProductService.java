@@ -15,4 +15,6 @@ public interface ProductService {
     Response<ProductDto> updateProduct(String productId, ProductDto productDto);
 
     Response<String> deleteProduct(String productId);
+
+    Response<ProductDto> getProductById(String productId);
 }

@@ -1,6 +1,7 @@
 package com.sj.ecommerce.serviceImpl;
 
 import com.sj.ecommerce.dto.CategoryDto;
+import com.sj.ecommerce.dto.UserDto;
 import com.sj.ecommerce.entity.Category;
 import com.sj.ecommerce.reponse.Response;
 import com.sj.ecommerce.repository.CategoryRepository;
@@ -8,6 +9,10 @@ import com.sj.ecommerce.service.CategoryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -22,7 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Response<CategoryDto> addCategory(CategoryDto categoryDto) {
         Response<CategoryDto> response = new Response<>();
-        try{
+        try {
             categoryRepository.save(modelMapper.map(categoryDto, Category.class));
             response.setData(modelMapper.map(categoryDto, CategoryDto.class));
             response.setMessage("Category added successfully");
@@ -34,7 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Response<CategoryDto> updateCategory(CategoryDto categoryDto,String categoryId) {
+    public Response<CategoryDto> updateCategory(CategoryDto categoryDto, String categoryId) {
         Response<CategoryDto> response = new Response<>();
         try {
             // Check if the category exists
@@ -84,7 +89,6 @@ public class CategoryServiceImpl implements CategoryService {
             if (categoryRepository.existsById(categoryId)) {
                 // Delete the category
                 categoryRepository.deleteById(categoryId);
-
                 // Set success response
                 response.setStatus("success");
                 response.setMessage("Category deleted successfully.");
@@ -103,6 +107,42 @@ public class CategoryServiceImpl implements CategoryService {
         }
         return response;
     }
+
+    @Override
+    public Response<List<CategoryDto>> getAllCategories() {
+        Response<List<CategoryDto>> response = new Response<>();
+        try {
+            List<Category> allCategories = categoryRepository.findAll();
+            List<CategoryDto> categoryDtoList = allCategories.stream()
+                    .map(category -> modelMapper.map(category, CategoryDto.class)).toList();
+            response.setData(categoryDtoList);  // Set data in response
+            response.setStatus("success");
+            response.setMessage("Users fetched successfully.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return response;
+    }
+
+    @Override
+    public Response<CategoryDto> getCategoryById(String categoryId) {
+        Response<CategoryDto> response = new Response<>();
+        try {
+            Category category = categoryRepository.findById(categoryId).orElseThrow(() ->
+                    new RuntimeException("Category not found by this id " + categoryId));
+            CategoryDto categoryDto = modelMapper.map(category, CategoryDto.class);
+            response.setData(categoryDto);
+            response.setStatus("success");
+            response.setMessage("Category fetched successfully.");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return response;
+    }
+
+
 
 
 }

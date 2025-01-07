@@ -4,8 +4,6 @@ import com.sj.ecommerce.dto.*;
 import com.sj.ecommerce.reponse.Response;
 import com.sj.ecommerce.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,7 +62,7 @@ public class AdminController {
         return categoryService.addCategory(categoryDto);
     }
 
-    @PutMapping("/categories/getCategory/{categoryId}")
+    @PutMapping("/categories/updateCategory/{categoryId}")
     Response<CategoryDto> updateCategory(@RequestBody CategoryDto categoryDto, @PathVariable String categoryId) {
         return categoryService.updateCategory(categoryDto, categoryId);
     }

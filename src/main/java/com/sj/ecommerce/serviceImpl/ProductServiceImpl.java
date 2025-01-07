@@ -118,4 +118,25 @@ public class ProductServiceImpl implements ProductService {
         }
         return response;
     }
+
+    @Override
+    public Response<ProductDto> getProductById(String productId) {
+        Response<ProductDto> response = new Response<>();
+        try {
+            boolean b = productRepository.existsById(productId);
+            if (b) {
+                Optional<Product> byId = productRepository.findById(productId);
+                ProductDto productDto = modelMapper.map(byId.get(), ProductDto.class);
+                response.setStatus("success");
+                response.setMessage("Product retrieved successfully.");
+                response.setData(productDto);
+            } else {
+                response.setStatus("error");
+                response.setMessage("Product not found.");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return response;
+    }
 }

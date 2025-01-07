@@ -10,7 +10,7 @@ public class ProductDto {
     private String name;
     private String description;
     private Double price;
-    private Integer stock; // Current stock quantity
+    private Integer stock; // Current stock - quantity
     private String categoryId; // Reference to Category
     private List<String> imageUrls;
 
