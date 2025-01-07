@@ -1,7 +1,7 @@
 package com.sj.ecommerce.service;
 
 import com.sj.ecommerce.dto.CartDto;
-import com.sj.ecommerce.reponse.Response;
+import com.sj.ecommerce.helper.Response;
 
 public interface CartService {
     Response<CartDto> addToCart(CartDto cartDto);

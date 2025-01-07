@@ -1,9 +1,8 @@
 package com.sj.ecommerce.serviceImpl;
 
 import com.sj.ecommerce.dto.ProductDto;
-import com.sj.ecommerce.dto.UserDto;
 import com.sj.ecommerce.entity.Product;
-import com.sj.ecommerce.reponse.Response;
+import com.sj.ecommerce.helper.Response;
 import com.sj.ecommerce.repository.ProductRepository;
 import com.sj.ecommerce.service.ProductService;
 import org.modelmapper.ModelMapper;

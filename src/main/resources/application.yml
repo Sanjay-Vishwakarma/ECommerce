@@ -1,17 +1,20 @@
-
-
 spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/ecommerce # MongoDB connection URI
       database: ecommerce                       # Database name
   application:
-    name: ecommerce-app                         # Application name (optional)
+    name: ecommerce-app                         # Application name
 
 server:
-  port: 8081 # Port for your Spring Boot application
+  port: 8081                                    # Port for the Spring Boot application
 
 logging:
   level:
     root: info                                  # Log level for root
     org.springframework.data.mongodb: debug    # Log level for MongoDB queries
+
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui-custom.html

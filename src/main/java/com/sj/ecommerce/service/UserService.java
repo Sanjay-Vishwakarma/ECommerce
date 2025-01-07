@@ -1,6 +1,6 @@
 package com.sj.ecommerce.service;
 
-import com.sj.ecommerce.reponse.Response;
+import com.sj.ecommerce.helper.Response;
 import com.sj.ecommerce.dto.UserDto;
 
 import java.util.List;

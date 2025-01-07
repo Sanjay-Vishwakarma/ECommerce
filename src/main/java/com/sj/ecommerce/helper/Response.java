@@ -1,4 +1,4 @@
-package com.sj.ecommerce.reponse;
+package com.sj.ecommerce.helper;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;

@@ -1,7 +1,7 @@
 package com.sj.ecommerce.serviceImpl;
 
 import com.sj.ecommerce.dto.InventoryDto;
-import com.sj.ecommerce.reponse.Response;
+import com.sj.ecommerce.helper.Response;
 import com.sj.ecommerce.repository.InventoryRepository;
 import com.sj.ecommerce.entity.Inventory;
 import com.sj.ecommerce.service.InventoryService;

@@ -1,18 +1,15 @@
 package com.sj.ecommerce.serviceImpl;
 
 import com.sj.ecommerce.dto.CategoryDto;
-import com.sj.ecommerce.dto.UserDto;
 import com.sj.ecommerce.entity.Category;
-import com.sj.ecommerce.reponse.Response;
+import com.sj.ecommerce.helper.Response;
 import com.sj.ecommerce.repository.CategoryRepository;
 import com.sj.ecommerce.service.CategoryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {

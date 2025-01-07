@@ -2,7 +2,7 @@ package com.sj.ecommerce.controller;
 
 
 import com.sj.ecommerce.dto.CategoryDto;
-import com.sj.ecommerce.reponse.Response;
+import com.sj.ecommerce.helper.Response;
 import com.sj.ecommerce.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
