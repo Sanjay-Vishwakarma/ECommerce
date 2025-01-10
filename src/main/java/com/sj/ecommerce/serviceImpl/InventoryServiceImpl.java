@@ -1,17 +1,21 @@
 package com.sj.ecommerce.serviceImpl;
 
 import com.sj.ecommerce.dto.InventoryDto;
-import com.sj.ecommerce.helper.Response;
+import com.sj.ecommerce.dto.PageableResponse;
+import com.sj.ecommerce.helper.PageHelper;
+import com.sj.ecommerce.dto.Response;
 import com.sj.ecommerce.repository.InventoryRepository;
 import com.sj.ecommerce.entity.Inventory;
 import com.sj.ecommerce.service.InventoryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class InventoryServiceImpl implements InventoryService {
@@ -21,6 +25,13 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Autowired
     private InventoryRepository inventoryRepository;
+
+    private final PageHelper pageHelper;
+
+    @Autowired
+    public InventoryServiceImpl(PageHelper pageHelper) {
+        this.pageHelper = pageHelper;
+    }
 
     @Override
     public Response<InventoryDto> addInventory(InventoryDto inventoryDto) {
@@ -88,33 +99,27 @@ public class InventoryServiceImpl implements InventoryService {
             response.setMessage("Inventory not found for productId: " + productId);
             response.setStatus("error");
         }
-
         return response;
     }
 
     @Override
-    public Response<List<InventoryDto>> getAllInventory() {
-        Response<List<InventoryDto>> response = new Response<>();
-
+    public PageableResponse<InventoryDto> getAllInventory(int pageNumber, int pageSize, String sortBy, String sortDir) {
         try {
-            List<Inventory> inventoryList = inventoryRepository.findAll(); // Fetch all inventory items
+            // Determine sorting direction
+            Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
-            // Convert Inventory list to InventoryDto list
-            List<InventoryDto> inventoryDtoList = inventoryList.stream()
-                    .map(inventory -> modelMapper.map(inventory, InventoryDto.class))
-                    .collect(Collectors.toList());
+            // Create Pageable object (adjust page number to zero-based indexing)
+            Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
 
-            response.setData(inventoryDtoList);
-            response.setCode("200");
-            response.setMessage("Inventory fetched successfully");
-            response.setStatus("success");
+            // Fetch paginated inventory items
+            Page<Inventory> inventoryPage = inventoryRepository.findAll(pageable);
+
+            // Use Helper to convert Page<Inventory> to PageableResponse<InventoryDto>
+            return pageHelper.getPageableResponse(inventoryPage, InventoryDto.class);
 
         } catch (Exception e) {
-            response.setData(null);
-            response.setCode("500");
-            response.setMessage("Error fetching inventory: " + e.getMessage());
-            response.setStatus("error");
+            throw new RuntimeException("Error fetching inventory: " + e.getMessage(), e); // Handle errors appropriately
         }
-        return response;
     }
+
 }

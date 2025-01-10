@@ -2,8 +2,8 @@ package com.sj.ecommerce.serviceImpl;
 
 import com.sj.ecommerce.common.Function;
 import com.sj.ecommerce.dto.PageableResponse;
-import com.sj.ecommerce.helper.Helper;
-import com.sj.ecommerce.helper.Response;
+import com.sj.ecommerce.helper.PageHelper;
+import com.sj.ecommerce.dto.Response;
 import com.sj.ecommerce.dto.UserDto;
 import com.sj.ecommerce.entity.User;
 import com.sj.ecommerce.repository.UserRepository;
@@ -17,9 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -29,6 +27,13 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    private final PageHelper pageHelper;
+
+    @Autowired
+    public UserServiceImpl(PageHelper pageHelper) {
+        this.pageHelper = pageHelper;
+    }
 
     Response<UserDto> response = new Response<>();
 
@@ -112,15 +117,16 @@ public class UserServiceImpl implements UserService {
         // Determine sorting direction
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
-        // Create Pageable object
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        // Create Pageable object (adjusting pageNumber to zero-based indexing for Pageable)
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
 
         // Fetch paginated data
         Page<User> userPage = userRepository.findAll(pageable);
 
         // Use Helper to convert Page<User> to PageableResponse<UserDto>
-        return Helper.getPageableResponse(userPage, UserDto.class);
+        return pageHelper.getPageableResponse(userPage, UserDto.class);
     }
+
 
 
     @Override

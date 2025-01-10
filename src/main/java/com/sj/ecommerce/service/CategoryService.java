@@ -1,9 +1,8 @@
 package com.sj.ecommerce.service;
 
 import com.sj.ecommerce.dto.CategoryDto;
-import com.sj.ecommerce.helper.Response;
-
-import java.util.List;
+import com.sj.ecommerce.dto.PageableResponse;
+import com.sj.ecommerce.dto.Response;
 
 public interface CategoryService {
     
@@ -13,7 +12,7 @@ public interface CategoryService {
 
     Response<String> deleteCategory(String categoryId);
 
-    Response<List<CategoryDto>> getAllCategories();
+    PageableResponse<CategoryDto> getAllCategories(int pageNumber, int pageSize, String sortBy, String sortDir);
 
     Response<CategoryDto> getCategoryById(String categoryId);
 }

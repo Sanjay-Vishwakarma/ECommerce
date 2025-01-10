@@ -2,7 +2,7 @@ package com.sj.ecommerce.serviceImpl;
 
 import com.sj.ecommerce.dto.CartDto;
 import com.sj.ecommerce.entity.Cart;
-import com.sj.ecommerce.helper.Response;
+import com.sj.ecommerce.dto.Response;
 import com.sj.ecommerce.repository.CartRepository;
 import com.sj.ecommerce.service.CartService;
 import org.modelmapper.ModelMapper;

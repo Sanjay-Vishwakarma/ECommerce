@@ -1,7 +1,7 @@
 package com.sj.ecommerce.controller;
 
 import com.sj.ecommerce.dto.*;
-import com.sj.ecommerce.helper.Response;
+import com.sj.ecommerce.dto.Response;
 import com.sj.ecommerce.request.LoginRequest;
 import com.sj.ecommerce.service.CartService;
 import com.sj.ecommerce.service.OrderService;
@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -59,8 +57,13 @@ public class UserController {
 
     // 5. Get All Products
     @GetMapping("/products/getAllProducts")
-    public Response<List<ProductDto>> getAllProducts() {
-        return productService.getAllProducts();
+    public PageableResponse<ProductDto> getAllProducts(
+            @RequestParam(value = "pageNumber", defaultValue = "1", required = false) int pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = "name", required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir
+    ) {
+        return productService.getAllProducts(pageNumber, pageSize, sortBy, sortDir);
     }
 
     // 6. Get Product by ID
@@ -125,16 +128,19 @@ public class UserController {
             errorResponse.setStatus("error");
             errorResponse.setMessage("Failed to place order: " + e.getMessage());
             errorResponse.setData(null);
-
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     // 12. Get Order History
     @GetMapping("/orders/history")
-    public ResponseEntity<Response<List<OrderDto>>> getOrderHistory(@RequestParam String userId) {
-        Response<List<OrderDto>> response = orderService.getOrderHistory(userId);
-        return ResponseEntity.ok(response);
+    public PageableResponse<OrderDto> getOrderHistory(@RequestParam String userId,
+                                                      @RequestParam(value = "pageNumber", defaultValue = "1", required = false) int pageNumber,
+                                                      @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
+                                                      @RequestParam(value = "sortBy", defaultValue = "name", required = false) String sortBy,
+                                                      @RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir) {
+       return  orderService.getOrderHistory(userId,pageNumber, pageSize, sortBy, sortDir);
+
     }
 
     // 13. Get Order by ID
@@ -145,7 +151,7 @@ public class UserController {
 
     @GetMapping("/getAllUsers")
     PageableResponse<UserDto> getAllUsers(
-            @RequestParam(value = "pageNumber", defaultValue = "0", required = false) int pageNumber,
+            @RequestParam(value = "pageNumber", defaultValue = "1", required = false) int pageNumber,
             @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
             @RequestParam(value = "sortBy", defaultValue = "name", required = false) String sortBy,
             @RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir

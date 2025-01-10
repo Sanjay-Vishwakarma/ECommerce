@@ -3,14 +3,20 @@ package com.sj.ecommerce.serviceImpl;
 import com.sj.ecommerce.dto.CartDto;
 import com.sj.ecommerce.dto.OrderDto;
 import com.sj.ecommerce.dto.OrderItemDto;
+import com.sj.ecommerce.dto.PageableResponse;
 import com.sj.ecommerce.entity.Cart;
-import com.sj.ecommerce.helper.Response;
+import com.sj.ecommerce.helper.PageHelper;
+import com.sj.ecommerce.dto.Response;
 import com.sj.ecommerce.repository.CartRepository;
 import com.sj.ecommerce.repository.OrderRepository;
 import com.sj.ecommerce.service.OrderService;
 import com.sj.ecommerce.entity.Order;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -30,22 +36,30 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private CartRepository cartRepository;
 
-    @Override
-    public Response<List<OrderDto>> getAllOrders() {
-        // Fetch all orders from the repository
-        List<Order> orders = orderRepository.findAll();
-        // Convert orders to DTOs
-        List<OrderDto> orderDtos = orders.stream()
-                .map(order -> modelMapper.map(order, OrderDto.class))
-                .collect(Collectors.toList());
-        // Prepare and return response
-        Response<List<OrderDto>> response = new Response<>();
-        response.setData(orderDtos);
-        response.setCode("200");
-        response.setMessage("Orders retrieved successfully");
-        response.setStatus("success");
-        return response;
+    private final PageHelper pageHelper;
+
+    @Autowired
+    public OrderServiceImpl(PageHelper pageHelper) {
+        this.pageHelper = pageHelper;
     }
+
+    @Override
+    public PageableResponse<OrderDto> getAllOrders(int pageNumber, int pageSize, String sortBy, String sortDir) {
+        // Determine sorting direction
+        Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        // Create a pageable object (adjust page number to start from 1 if necessary)
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
+
+        // Fetch paginated data from repository
+        Page<Order> orderPage = orderRepository.findAll(pageable);
+
+        // Convert entities to DTOs
+        PageableResponse<OrderDto> pageableResponse = pageHelper.getPageableResponse(orderPage, OrderDto.class);
+
+        return pageableResponse;
+    }
+
 
     @Override
     public Response<OrderDto> updateOrderStatus(String orderId, String status) {
@@ -158,49 +172,65 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+//    @Override
+//    public PageableResponse<OrderDto> getOrderHistory(String userId,int pageNumber, int pageSize, String sortBy, String sortDir) {
+//        // Fetch orders for the specific user
+//        List<Order> orders = orderRepository.findByUserId(userId);
+//
+//        // Manually map the Order entities to OrderDto
+//        List<OrderDto> orderDtos = orders.stream()
+//                .map(order -> {
+//                    // Map the Order entity to OrderDto using ModelMapper
+//                    OrderDto orderDto = modelMapper.map(order, OrderDto.class);
+//
+//                    // Manually map orderItems to orderItemDto
+//                    List<OrderItemDto> orderItemDtos = order.getOrderItems().stream()
+//                            .map(orderItem -> {
+//                                OrderItemDto itemDto = new OrderItemDto();
+//                                itemDto.setProductId(orderItem.getProductId());
+//                                itemDto.setProductName(orderItem.getProductName());
+//                                itemDto.setQuantity(orderItem.getQuantity());
+//                                itemDto.setTotalPrice(orderItem.getTotalPrice());
+//                                return itemDto;
+//                            })
+//                            .collect(Collectors.toList());
+//
+//                    // Set the orderItems in the orderDto
+//                    orderDto.setOrderItemDto(orderItemDtos);
+//
+//                    // Set the orderDate
+//                    if (order.getOrderDate() != null) {
+//                        orderDto.setOrderDate(order.getOrderDate());
+//                    }
+//
+//                    return orderDto;
+//                })
+//                .collect(Collectors.toList());
+//
+//        // Create a Response object and set the data
+//        Response<List<OrderDto>> response = new Response<>();
+//        response.setData(orderDtos);
+//        response.setCode("200");  // You can set appropriate code
+//        response.setMessage("Order history fetched successfully");
+//        response.setStatus("SUCCESS");
+//
+//        return response;
+//    }
+
+
     @Override
-    public Response<List<OrderDto>> getOrderHistory(String userId) {
-        // Fetch orders for the specific user
-        List<Order> orders = orderRepository.findByUserId(userId);
+    public PageableResponse<OrderDto> getOrderHistory(String userId, int pageNumber, int pageSize, String sortBy, String sortDir) {
+        // Determine sorting direction
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
-        // Manually map the Order entities to OrderDto
-        List<OrderDto> orderDtos = orders.stream()
-                .map(order -> {
-                    // Map the Order entity to OrderDto using ModelMapper
-                    OrderDto orderDto = modelMapper.map(order, OrderDto.class);
+        // Create Pageable object (adjusting page number to zero-based indexing)
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
 
-                    // Manually map orderItems to orderItemDto
-                    List<OrderItemDto> orderItemDtos = order.getOrderItems().stream()
-                            .map(orderItem -> {
-                                OrderItemDto itemDto = new OrderItemDto();
-                                itemDto.setProductId(orderItem.getProductId());
-                                itemDto.setProductName(orderItem.getProductName());
-                                itemDto.setQuantity(orderItem.getQuantity());
-                                itemDto.setTotalPrice(orderItem.getTotalPrice());
-                                return itemDto;
-                            })
-                            .collect(Collectors.toList());
+        // Fetch paginated orders for the specific user
+        Page<Order> orderPage = orderRepository.findByUserId(userId, pageable);
 
-                    // Set the orderItems in the orderDto
-                    orderDto.setOrderItemDto(orderItemDtos);
-
-                    // Set the orderDate
-                    if (order.getOrderDate() != null) {
-                        orderDto.setOrderDate(order.getOrderDate());
-                    }
-
-                    return orderDto;
-                })
-                .collect(Collectors.toList());
-
-        // Create a Response object and set the data
-        Response<List<OrderDto>> response = new Response<>();
-        response.setData(orderDtos);
-        response.setCode("200");  // You can set appropriate code
-        response.setMessage("Order history fetched successfully");
-        response.setStatus("SUCCESS");
-
-        return response;
+        // Use Helper to convert Page<Order> to PageableResponse<OrderDto>
+        return pageHelper.getPageableResponse(orderPage, OrderDto.class);
     }
 
 

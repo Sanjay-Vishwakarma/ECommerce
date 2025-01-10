@@ -1,15 +1,17 @@
 package com.sj.ecommerce.service;
 
+import com.sj.ecommerce.dto.PageableResponse;
 import com.sj.ecommerce.dto.ProductDto;
-import com.sj.ecommerce.helper.Response;
-
-import java.util.List;
+import com.sj.ecommerce.dto.Response;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface ProductService {
 
-    Response<List<ProductDto>> getAllProducts();
+    PageableResponse<ProductDto> getAllProducts(int pageNumber, int pageSize, String sortBy, String sortDir);
 
-    Response<ProductDto> addProduct(ProductDto productDto);
+//    Response<ProductDto> addProduct(ProductDto productDto);
+
+    Response<ProductDto> addProductWithImages(String productDto, MultipartFile[] images);
 
     Response<ProductDto> updateProduct(String productId, ProductDto productDto);
 

@@ -1,7 +1,5 @@
 package com.sj.ecommerce.common;
 
-import java.security.SecureRandom;
-
 public class Function {
 
     private static final String LOWERCASE = "abcdefghijklmnopqrstuvwxyz";

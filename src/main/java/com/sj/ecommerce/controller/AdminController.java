@@ -1,12 +1,11 @@
 package com.sj.ecommerce.controller;
 
 import com.sj.ecommerce.dto.*;
-import com.sj.ecommerce.helper.Response;
+import com.sj.ecommerce.dto.Response;
 import com.sj.ecommerce.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -28,6 +27,11 @@ public class AdminController {
     @Autowired
     private InventoryService inventoryService;
 
+    @GetMapping("/users/{userId}")
+    Response<UserDto> getUser(@PathVariable String userId) {
+        return userService.getUserProfile(userId);
+    }
+
     @GetMapping("/users/getAllUsers")
     PageableResponse<UserDto> getAllUsers(
             @RequestParam(value = "pageNumber", defaultValue = "1", required = false) int pageNumber,
@@ -38,20 +42,10 @@ public class AdminController {
         return userService.getAllUser(pageNumber, pageSize, sortBy, sortDir);
     }
 
-    @GetMapping("/users/{userId}")
-    Response<UserDto> getUser(@PathVariable String userId) {
-        return userService.getUserProfile(userId);
-    }
-
     @DeleteMapping("/users/delete/{userId}")
     Response<String> deleteUser(@PathVariable String userId) {
         return userService.deleteUser(userId);
     }
-
-   /* Category Management:
-    POST /admin/categories – Add a new category.
-    PUT /admin/categories/{categoryId} – Update an existing category.
-    DELETE /admin/categories/{categoryId} – Remove a category.*/
 
 
     @PostMapping("/categories/addCategory")
@@ -69,16 +63,12 @@ public class AdminController {
         return categoryService.deleteCategory(categoryId);
     }
 
-    /*
-    * Product Management:
-        POST /admin/products – Add a new product.
-        PUT /admin/products/{productId} – Update product details.
-        DELETE /admin/products/{productId} – Delete a product.*/
-
-    // Add a new product
     @PostMapping("/products/addProduct")
-    public Response<ProductDto> addProduct(@RequestBody ProductDto productDto) {
-        return productService.addProduct(productDto);
+    public Response<ProductDto> addProductWithImages(
+            @RequestParam String productData,  // Accepting ProductDto as a request body
+            @RequestParam("images") MultipartFile[] images
+    ) {
+        return productService.addProductWithImages(productData, images);
     }
 
     // Update product details
@@ -95,16 +85,15 @@ public class AdminController {
         return productService.deleteProduct(productId);
     }
 
-
-    /* Order Management:
-        GET /admin/orders – Get all orders.
-        PUT /admin/orders/{orderId} – Update order status (e.g., "Shipped", "Delivered").
-        DELETE /admin/orders/{orderId} – Cancel an order.*/
-
     // Get all orders
     @GetMapping("/orders/getAllOrders")
-    public Response<List<OrderDto>> getAllOrders() {
-        return orderService.getAllOrders();
+    public PageableResponse<OrderDto> getAllOrders(
+            @RequestParam(value = "pageNumber", defaultValue = "1", required = false) int pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = "name", required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir
+    ) {
+        return orderService.getAllOrders(pageNumber, pageSize, sortBy, sortDir);
     }
 
     // Update order status
@@ -119,12 +108,6 @@ public class AdminController {
         return orderService.deleteOrder(orderId);
     }
 
-    /*
-    *  Inventory Management:
-        POST /admin/inventory – Add inventory for a product.
-        PUT /admin/inventory/{productId} – Update inventory stock.
-        DELETE /admin/inventory/{productId} – Delete inventory for a product.*/
-
     // Add inventory
     @PostMapping("/inventory/addProduct")
     public Response<InventoryDto> addInventory(@RequestBody InventoryDto inventoryDto) {
@@ -136,7 +119,6 @@ public class AdminController {
     public Response<InventoryDto> updateInventoryStock(
             @PathVariable String productId, @RequestBody InventoryDto inventoryDto) {
         return inventoryService.updateInventoryStock(productId, inventoryDto);
-
     }
 
     // Delete inventory
@@ -146,10 +128,14 @@ public class AdminController {
     }
 
     // get all inventory
-
     @GetMapping("/inventory/getAllInventory")
-    public Response<List<InventoryDto>> getAllInventory() {
-        return inventoryService.getAllInventory();
+    public PageableResponse<InventoryDto> getAllInventory(
+            @RequestParam(value = "pageNumber", defaultValue = "1", required = false) int pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = "name", required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir
+    ) {
+        return inventoryService.getAllInventory(pageNumber, pageSize, sortBy, sortDir);
     }
 
     /*

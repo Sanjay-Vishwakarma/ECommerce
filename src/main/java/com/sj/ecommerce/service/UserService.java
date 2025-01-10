@@ -1,7 +1,7 @@
 package com.sj.ecommerce.service;
 
 import com.sj.ecommerce.dto.PageableResponse;
-import com.sj.ecommerce.helper.Response;
+import com.sj.ecommerce.dto.Response;
 import com.sj.ecommerce.dto.UserDto;
 
 

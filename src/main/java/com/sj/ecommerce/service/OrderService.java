@@ -1,13 +1,12 @@
 package com.sj.ecommerce.service;
 
 import com.sj.ecommerce.dto.OrderDto;
-import com.sj.ecommerce.helper.Response;
-
-import java.util.List;
+import com.sj.ecommerce.dto.PageableResponse;
+import com.sj.ecommerce.dto.Response;
 
 public interface OrderService {
 
-    Response<List<OrderDto>> getAllOrders();
+    PageableResponse<OrderDto> getAllOrders(int pageNumber, int pageSize, String sortBy, String sortDir);
 
     Response<OrderDto> updateOrderStatus(String orderId, String status);
 
@@ -15,7 +14,7 @@ public interface OrderService {
 
     Response<OrderDto> placeOrder(String userId);
 
-    Response<List<OrderDto>> getOrderHistory(String userId);
+    PageableResponse<OrderDto> getOrderHistory(String userId,int pageNumber, int pageSize, String sortBy, String sortDir);
 
     Response<OrderDto> getOrderById(String getOrderById);
 }

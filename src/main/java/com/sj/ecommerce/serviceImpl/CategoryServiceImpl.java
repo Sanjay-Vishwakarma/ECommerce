@@ -1,15 +1,19 @@
 package com.sj.ecommerce.serviceImpl;
 
 import com.sj.ecommerce.dto.CategoryDto;
+import com.sj.ecommerce.dto.PageableResponse;
 import com.sj.ecommerce.entity.Category;
-import com.sj.ecommerce.helper.Response;
+import com.sj.ecommerce.helper.PageHelper;
+import com.sj.ecommerce.dto.Response;
 import com.sj.ecommerce.repository.CategoryRepository;
 import com.sj.ecommerce.service.CategoryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -20,6 +24,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    private final PageHelper pageHelper;
+
+    @Autowired
+    public CategoryServiceImpl(PageHelper pageHelper) {
+        this.pageHelper = pageHelper;
+    }
 
     @Override
     public Response<CategoryDto> addCategory(CategoryDto categoryDto) {
@@ -106,21 +117,15 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Response<List<CategoryDto>> getAllCategories() {
-        Response<List<CategoryDto>> response = new Response<>();
-        try {
-            List<Category> allCategories = categoryRepository.findAll();
-            List<CategoryDto> categoryDtoList = allCategories.stream()
-                    .map(category -> modelMapper.map(category, CategoryDto.class)).toList();
-            response.setData(categoryDtoList);  // Set data in response
-            response.setStatus("success");
-            response.setMessage("Users fetched successfully.");
+    public PageableResponse<CategoryDto> getAllCategories(int pageNumber, int pageSize, String sortBy, String sortDir) {
+        // Determine sorting direction
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        // Create Pageable object (adjusting page number to zero-based indexing)
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-        return response;
+        Page<Category> all = categoryRepository.findAll(pageable);
+
+        return pageHelper.getPageableResponse(all, CategoryDto.class);
     }
 
     @Override
@@ -138,8 +143,6 @@ public class CategoryServiceImpl implements CategoryService {
         }
         return response;
     }
-
-
 
 
 }

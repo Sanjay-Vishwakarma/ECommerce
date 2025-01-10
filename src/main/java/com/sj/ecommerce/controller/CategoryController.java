@@ -2,14 +2,11 @@ package com.sj.ecommerce.controller;
 
 
 import com.sj.ecommerce.dto.CategoryDto;
-import com.sj.ecommerce.helper.Response;
+import com.sj.ecommerce.dto.PageableResponse;
+import com.sj.ecommerce.dto.Response;
 import com.sj.ecommerce.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/categories")
@@ -18,17 +15,15 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-    /*
-    * Manages product categories.APIs:
-    GET /categories – Get all categories.
-    GET /categories/{categoryId} – Get a specific category.
-    POST /categories – Add a new category.
-    PUT /categories/{categoryId} – Update a category.
-    DELETE /categories/{categoryId} – Delete a category.*/
 
     @GetMapping("/getAllCatogories")
-    Response<List<CategoryDto>> getAllCategories() {
-        return categoryService.getAllCategories();
+    PageableResponse<CategoryDto> getAllCategories(
+            @RequestParam(value = "pageNumber", defaultValue = "1", required = false) int pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = "name", required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir
+    ) {
+        return categoryService.getAllCategories(pageNumber, pageSize, sortBy, sortDir);
     }
 
     @GetMapping("/getCategoryById/{categoryId}")
