@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   data:
     mongodb:
       uri: mongodb://localhost:27017/ecommerce # MongoDB connection URI
@@ -18,3 +22,8 @@ logging:
 springdoc:
   swagger-ui:
     path: /swagger-ui-custom.html
+
+cloudinary:
+  cloud-name: djrxcaxbc
+  api-key: 165721923489928
+  api-secret: ZdzyHrMrhVNeh9vtxG09CBvP3Uw
