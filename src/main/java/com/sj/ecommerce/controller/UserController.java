@@ -1,10 +1,7 @@
 package com.sj.ecommerce.controller;
 
-import com.sj.ecommerce.dto.CartDto;
-import com.sj.ecommerce.dto.OrderDto;
-import com.sj.ecommerce.dto.ProductDto;
+import com.sj.ecommerce.dto.*;
 import com.sj.ecommerce.helper.Response;
-import com.sj.ecommerce.dto.UserDto;
 import com.sj.ecommerce.request.LoginRequest;
 import com.sj.ecommerce.service.CartService;
 import com.sj.ecommerce.service.OrderService;
@@ -14,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -56,7 +54,7 @@ public class UserController {
     // 4. Update User Profile
     @PutMapping("/profile/update/{getUserById}")
     public Response<UserDto> updateUserProfile(@PathVariable String getUserById, @RequestBody UserDto userDTO) {
-        return  userService.updateUserProfile(getUserById, userDTO);
+        return userService.updateUserProfile(getUserById, userDTO);
     }
 
     // 5. Get All Products
@@ -145,10 +143,14 @@ public class UserController {
         return orderService.getOrderById(getOrderById);
     }
 
-    //14. Get All Users
     @GetMapping("/getAllUsers")
-    Response<List<UserDto>> getAllUsers() {
-        return userService.getAllUsers();
+    PageableResponse<UserDto> getAllUsers(
+            @RequestParam(value = "pageNumber", defaultValue = "0", required = false) int pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = "name", required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir
+    ) {
+        return userService.getAllUser(pageNumber, pageSize, sortBy, sortDir);
     }
 
 

@@ -1,6 +1,8 @@
 package com.sj.ecommerce.serviceImpl;
 
 import com.sj.ecommerce.common.Function;
+import com.sj.ecommerce.dto.PageableResponse;
+import com.sj.ecommerce.helper.Helper;
 import com.sj.ecommerce.helper.Response;
 import com.sj.ecommerce.dto.UserDto;
 import com.sj.ecommerce.entity.User;
@@ -8,6 +10,10 @@ import com.sj.ecommerce.repository.UserRepository;
 import com.sj.ecommerce.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -102,27 +108,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Response<List<UserDto>> getAllUsers() {
-        Response<List<UserDto>> response = new Response<>();
-        try {
-            List<User> allUsers = userRepository.findAll();
+    public PageableResponse<UserDto> getAllUser(int pageNumber, int pageSize, String sortBy, String sortDir) {
+        // Determine sorting direction
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
-            // Map User entities to UserDto objects
-            List<UserDto> userDtos = allUsers.stream()
-                    .map(user -> modelMapper.map(user, UserDto.class)) // Example mapping
-                    .collect(Collectors.toList());
+        // Create Pageable object
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
-            response.setData(userDtos);  // Set data in response
-            response.setStatus("success");
-            response.setMessage("Users fetched successfully.");
+        // Fetch paginated data
+        Page<User> userPage = userRepository.findAll(pageable);
 
-        } catch (Exception e) {
-            e.printStackTrace();  // Log the error (ideally use a logger instead)
-            response.setStatus("error");
-            response.setMessage("An error occurred while fetching users.");
-        }
-        return response;
+        // Use Helper to convert Page<User> to PageableResponse<UserDto>
+        return Helper.getPageableResponse(userPage, UserDto.class);
     }
+
 
     @Override
     public Response<String> deleteUser(String userId) {

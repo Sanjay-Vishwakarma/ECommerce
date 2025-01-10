@@ -38,9 +38,11 @@ public class CartServiceImpl implements CartService {
     public Response<CartDto> getCart(String userId) {
         Response<CartDto> response = new Response<>();
         try {
+            System.out.println("userId = " + userId);
 //            String userId = authenticationService.getAuthenticatedUserId();
             // Fetch the cart for the user
             CartDto byUserIdCartDetails = cartRepository.findByUserId(userId);
+            System.out.println("byUserIdCartDetails = " + byUserIdCartDetails);
 
             // Convert the cart entity to a DTO (Data Transfer Object)
             response.setData(byUserIdCartDetails);

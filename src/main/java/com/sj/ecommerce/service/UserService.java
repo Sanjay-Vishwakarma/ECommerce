@@ -1,9 +1,9 @@
 package com.sj.ecommerce.service;
 
+import com.sj.ecommerce.dto.PageableResponse;
 import com.sj.ecommerce.helper.Response;
 import com.sj.ecommerce.dto.UserDto;
 
-import java.util.List;
 
 public interface UserService {
 
@@ -13,7 +13,7 @@ public interface UserService {
 
     Response<UserDto> updateUserProfile(String id, UserDto userDTO);
 
-    Response<List<UserDto>> getAllUsers();
+    PageableResponse<UserDto> getAllUser(int pageNumber, int pageSize, String sortBy, String sortDir);
 
     Response<String> deleteUser(String userId);
 

@@ -28,17 +28,14 @@ public class AdminController {
     @Autowired
     private InventoryService inventoryService;
 
-
-
-   /* User Management:
-    GET /admin/users – Get a list of all users.
-    GET /admin/users/{userId} – Get details of a specific user.
-    DELETE /admin/users/{userId} – Delete a user.
-    PUT /admin/users/{userId} – Update user roles or status.*/
-
     @GetMapping("/users/getAllUsers")
-    Response<List<UserDto>> getAllUsers() {
-        return userService.getAllUsers();
+    PageableResponse<UserDto> getAllUsers(
+            @RequestParam(value = "pageNumber", defaultValue = "1", required = false) int pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = "name", required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir
+    ) {
+        return userService.getAllUser(pageNumber, pageSize, sortBy, sortDir);
     }
 
     @GetMapping("/users/{userId}")
@@ -119,7 +116,7 @@ public class AdminController {
     // Delete an order
     @DeleteMapping("/orders/delete/{orderId}")
     public Response<String> deleteOrder(@PathVariable String orderId) {
-       return orderService.deleteOrder(orderId);
+        return orderService.deleteOrder(orderId);
     }
 
     /*
@@ -138,7 +135,7 @@ public class AdminController {
     @PutMapping("/inventory/update/{productId}")
     public Response<InventoryDto> updateInventoryStock(
             @PathVariable String productId, @RequestBody InventoryDto inventoryDto) {
-       return inventoryService.updateInventoryStock(productId, inventoryDto);
+        return inventoryService.updateInventoryStock(productId, inventoryDto);
 
     }
 
