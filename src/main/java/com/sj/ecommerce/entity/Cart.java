@@ -3,11 +3,11 @@ package com.sj.ecommerce.entity;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
+@Data
 @Document(collection = "carts")
 public class Cart {
     @Id
@@ -18,30 +18,6 @@ public class Cart {
 
     @NotNull(message = "Cart items cannot be null.")
     private List<CartItem> cartItems; // Embedded documents
-
-    public List<CartItem> getCartItems() {
-        return cartItems;
-    }
-
-    public void setCartItems(List<CartItem> cartItems) {
-        this.cartItems = cartItems;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 
 
     @Data
@@ -58,36 +34,5 @@ public class Cart {
 
         private String productName;
 
-        public String getProductName() {
-            return productName;
-        }
-
-        public void setProductName(String productName) {
-            this.productName = productName;
-        }
-
-        public Double getProductPrice() {
-            return productPrice;
-        }
-
-        public void setProductPrice(Double productPrice) {
-            this.productPrice = productPrice;
-        }
-
-        public String getProductId() {
-            return productId;
-        }
-
-        public void setProductId(String productId) {
-            this.productId = productId;
-        }
-
-        public Integer getQuantity() {
-            return quantity;
-        }
-
-        public void setQuantity(Integer quantity) {
-            this.quantity = quantity;
-        }
     }
 }

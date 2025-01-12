@@ -19,10 +19,6 @@ logging:
     org.springframework.data.mongodb: debug    # Log level for MongoDB queries
 
 
-springdoc:
-  swagger-ui:
-    path: /swagger-ui-custom.html
-
 cloudinary:
   cloud-name: djrxcaxbc
   api-key: 165721923489928
