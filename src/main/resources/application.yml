@@ -23,3 +23,19 @@ cloudinary:
   cloud-name: djrxcaxbc
   api-key: 165721923489928
   api-secret: ZdzyHrMrhVNeh9vtxG09CBvP3Uw
+
+springdoc:
+  swagger-ui:
+    path: /api-docs
+    enabled: true # Set to false to disable UI
+
+jwt:
+  secret: c2VjdXJlX2tleV9mb3JfSFM1MTJfdXNpbmdfbm93X2dlbmVyYXRlZF9mb3Jfd2Vi
+
+admin:
+  role:
+    id: qwertyuytrertyuisdgflkj
+
+normal:
+  role:
+    id: qwertkjhgfdertyuasdfi

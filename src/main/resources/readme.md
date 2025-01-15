@@ -68,3 +68,62 @@ APIs:
 
     Notification Management:
         POST /admin/notifications – Broadcast a notification to all users.
+
+
+
+
+    /* Durgesh
+     @Bean
+    public FilterRegistrationBean corsFilter() {
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowCredentials(true);
+//        configuration.setAllowedOrigins(Arrays.asList("https://domain2.com","http://localhost:4200"));
+configuration.addAllowedOriginPattern("*");
+configuration.addAllowedHeader("Authorization");
+configuration.addAllowedHeader("Content-Type");
+configuration.addAllowedHeader("Accept");
+configuration.addAllowedMethod("GET");
+configuration.addAllowedMethod("POST");
+configuration.addAllowedMethod("DELETE");
+configuration.addAllowedMethod("PUT");
+configuration.addAllowedMethod("OPTIONS");
+configuration.setMaxAge(3600L);
+source.registerCorsConfiguration("/**", configuration);
+
+        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean(new CorsFilter(source));
+        filterRegistrationBean.setOrder(-110);
+        return filterRegistrationBean;
+    }
+     */
+
+
+
+/*
+http.csrf()
+.disable()
+.authorizeRequests()
+.antMatchers("/auth/login")
+.permitAll()
+.antMatchers("/auth/google")
+.permitAll()
+.antMatchers(HttpMethod.POST, "/users")
+.permitAll()
+.antMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
+.antMatchers(PUBLIC_URLS)
+.permitAll()
+.antMatchers(HttpMethod.GET)
+.permitAll()
+.anyRequest()
+.authenticated()
+.and()
+.exceptionHandling()
+.authenticationEntryPoint(authenticationEntryPoint)
+.and()
+.sessionManagement()
+.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+return http.build();
+}
+*/

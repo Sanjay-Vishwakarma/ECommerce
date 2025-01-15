@@ -10,6 +10,7 @@ import com.sj.ecommerce.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -149,6 +150,7 @@ public class UserController {
         return orderService.getOrderById(getOrderById);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getAllUsers")
     PageableResponse<UserDto> getAllUsers(
             @RequestParam(value = "pageNumber", defaultValue = "1", required = false) int pageNumber,

@@ -27,6 +27,11 @@ public class AdminController {
     @Autowired
     private InventoryService inventoryService;
 
+    @GetMapping("/system")
+    public String system() {
+        return "I'm a  admin.";
+    }
+
     @GetMapping("/users/{userId}")
     Response<UserDto> getUser(@PathVariable String userId) {
         return userService.getUserProfile(userId);

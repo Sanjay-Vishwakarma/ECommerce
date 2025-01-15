@@ -1,7 +1,7 @@
 package com.sj.ecommerce.serviceImpl;
 
-import com.sj.ecommerce.common.Function;
 import com.sj.ecommerce.dto.PageableResponse;
+import com.sj.ecommerce.entity.Role;
 import com.sj.ecommerce.helper.PageHelper;
 import com.sj.ecommerce.dto.Response;
 import com.sj.ecommerce.dto.UserDto;
@@ -14,10 +14,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -27,6 +30,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private final PageHelper pageHelper;
 
@@ -56,11 +62,14 @@ public class UserServiceImpl implements UserService {
                 response.setMessage("User already exists.");
                 return response;
             }
+
             // Map DTO to entity and save the new user
             User user = modelMapper.map(userDto, User.class);
-            user.setRoles("user");
+            // Assign default roles (ensure Role object is used instead of String)
+            Role userRole = new Role("ROLE_USER"); // Create a Role object
+            user.setRoles(Set.of(userRole));
             user.setCreatedAt(LocalDateTime.now());
-            user.setPassword(Function.generatePassword());
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
             userRepository.save(user);
 
             response.setCode("US0000");
