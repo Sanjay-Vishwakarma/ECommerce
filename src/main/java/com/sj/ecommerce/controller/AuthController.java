@@ -108,6 +108,7 @@ public class AuthController {
 
         // Map User to UserDto
         UserDto userDto = UserDto.builder()
+                .id(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
                 .roles(user.getRoles().stream()  // Convert Set<Role> to Set<RoleDto>

@@ -42,12 +42,13 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/webjars/**",
             "/swagger-resources/**",
-            "/v3/api-docs",
-            "/v2/api-docs",
+            "/v3/api-docs/**",
+            "/v2/api-docs/**",
             "/test",
             "/api/user/**",
             "/auth/login/**"
     };
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -85,7 +86,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // Front-end URL
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:8081")); // Front-end URL
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);

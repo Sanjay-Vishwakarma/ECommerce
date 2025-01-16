@@ -1,6 +1,9 @@
 package com.sj.ecommerce.common;
 
-public class Function {
+import java.security.SecureRandom;
+import java.util.UUID;
+
+public class Functions {
 
     private static final String LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
     private static final String UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -16,4 +19,21 @@ public class Function {
         }
         return password.toString();
     }
+
+    public static String randomIdGenerator() {
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 25);
+    }
+
+    public static String generateOtp() {
+        SecureRandom random = new SecureRandom();
+        int otp = 100000 + random.nextInt(900000);
+        return String.valueOf(otp);
+    }
+
+    public static void main(String[] args) {
+        System.out.println("randomIdGenerator = " + randomIdGenerator());
+        System.out.println("generateOtp = " + generateOtp());
+    }
+
+
 }

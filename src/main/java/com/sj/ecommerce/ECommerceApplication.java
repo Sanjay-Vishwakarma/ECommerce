@@ -1,5 +1,6 @@
 package com.sj.ecommerce;
 
+import com.sj.ecommerce.common.Functions;
 import com.sj.ecommerce.entity.Role;
 import com.sj.ecommerce.repository.RoleRepository;
 import com.sj.ecommerce.repository.UserRepository;
@@ -44,7 +45,7 @@ public class ECommerceApplication implements CommandLineRunner {
 			Role role_user = Role.builder().roleId(role_normal_id).roleName("ROLE_USER").build();
 
 			User adminUser = User.builder()
-					.id(UUID.randomUUID().toString())
+					.id(Functions.randomIdGenerator())
 					.name("Admin User")
 					.email("admin@gmail.com")
 					.password(passwordEncoder.encode("admin@123")) // Use your password encoder here
@@ -60,7 +61,7 @@ public class ECommerceApplication implements CommandLineRunner {
 					.build();
 
 			User normalUser = User.builder()
-					.id(UUID.randomUUID().toString())
+					.id(Functions.randomIdGenerator())
 					.name("Sanjay Vishwakarma")
 					.email("sjroot9@gmail.com")
 					.password(passwordEncoder.encode("test@123")) // Use your password encoder here
@@ -86,7 +87,9 @@ public class ECommerceApplication implements CommandLineRunner {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-*/
+
+
+ */
 	}
 
 

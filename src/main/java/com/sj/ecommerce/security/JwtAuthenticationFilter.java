@@ -24,64 +24,144 @@ import java.util.stream.Collectors;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    private static final String AUTH_HEADER = "Authorization";
+    private static final String BEARER_PREFIX = "Bearer ";
 
     @Autowired
     private JwtHelper jwtHelper;
 
     @Autowired
     private UserDetailsService userDetailsService;
-
+/*
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // Extract the Authorization header
-        String requestHeader = request.getHeader("Authorization");
-        System.out.println("requestHeader = " + requestHeader);
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
+        String requestURI = request.getRequestURI();
+        String requestHeader = request.getHeader(AUTH_HEADER);
+        logger.info("Processing request URI: {}", requestURI);
+
+        // Skip filtering for public paths like Swagger
+        if (isPublicPath(requestURI)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String username = null;
         String token = null;
 
-        System.out.println("request = " + request);
-        // Check if the token is present and starts with "Bearer "
-        if (requestHeader != null && requestHeader.startsWith("Bearer ")) {
-            token = requestHeader.substring(7); // Extract the token
-            System.out.println("token = " + token);
+        // Check Authorization header for Bearer token
+        if (requestHeader != null && requestHeader.startsWith(BEARER_PREFIX)) {
+            token = requestHeader.substring(BEARER_PREFIX.length());
+            logger.debug("Extracted token: {}", token);
+
             try {
-                username = jwtHelper.getUsernameFromToken(token); // Get username from the token
-                System.out.println("token = " + token);
+                username = jwtHelper.getUsernameFromToken(token);
             } catch (Exception e) {
-                logger.error("Error while parsing token: {}", e.getMessage());
+                logger.error("Error while parsing token", e);
             }
         } else {
             logger.warn("Invalid Authorization header");
         }
 
-        // Validate the token and set the authentication in the security context
+        // Validate the token and set authentication
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            // Validate the token using the helper method
             if (jwtHelper.validateToken(token, userDetails)) {
-                // Extract roles from the token and map them to GrantedAuthority
                 List<GrantedAuthority> authorities = jwtHelper.getRolesFromToken(token).stream()
-                        .map(SimpleGrantedAuthority::new)  // Create authorities from role strings
+                        .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-                // Log the authorities for debugging
-                logger.info("Authorities for user {}: {}", username, authorities);
+                logger.info("Authenticated user: {} with roles: {}", username, authorities);
 
-                // Create authentication object with the user details and authorities
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // Set the authentication in the security context
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } else {
-                logger.warn("Token validation failed for user: {}", username);
+                logger.warn("Token validation failed for user: {}. Token: {}", username, token);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Invalid or expired token");
+                response.getWriter().flush();
+                return;
             }
         }
 
-        filterChain.doFilter(request, response);  // Continue filter chain
+        filterChain.doFilter(request, response);
     }
+
+
+ */
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
+        String requestURI = request.getRequestURI();
+        logger.info("Processing request URI: {}", requestURI);
+
+        // Skip filtering for public paths
+        if (isPublicPath(requestURI)) {
+            logger.debug("Public path, skipping filter for URI: {}", requestURI);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // Existing token validation logic...
+        String requestHeader = request.getHeader(AUTH_HEADER);
+        String username = null;
+        String token = null;
+
+        if (requestHeader != null && requestHeader.startsWith(BEARER_PREFIX)) {
+            token = requestHeader.substring(BEARER_PREFIX.length());
+            logger.debug("Extracted token: {}", token);
+
+            try {
+                username = jwtHelper.getUsernameFromToken(token);
+            } catch (Exception e) {
+                logger.error("Error while parsing token", e);
+            }
+        } else {
+            logger.warn("Invalid or missing Authorization header");
+        }
+
+        // Token validation and setting SecurityContext
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            if (jwtHelper.validateToken(token, userDetails)) {
+                List<GrantedAuthority> authorities = jwtHelper.getRolesFromToken(token).stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
+
+                logger.info("Authenticated user: {} with roles: {}", username, authorities);
+
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                logger.warn("Token validation failed for user: {}", username);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Invalid or expired token");
+                response.getWriter().flush();
+                return;
+            }
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    private boolean isPublicPath(String requestURI) {
+        return requestURI.startsWith("/swagger-ui") ||
+                requestURI.startsWith("/v3/api-docs") ||
+                requestURI.startsWith("/swagger-resources") ||
+                requestURI.startsWith("/webjars") ||
+                requestURI.startsWith("/v2/api-docs");
+    }
+
 }
