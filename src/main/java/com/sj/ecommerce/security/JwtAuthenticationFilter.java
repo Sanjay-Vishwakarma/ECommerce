@@ -33,68 +33,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private UserDetailsService userDetailsService;
-/*
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-
-        String requestURI = request.getRequestURI();
-        String requestHeader = request.getHeader(AUTH_HEADER);
-        logger.info("Processing request URI: {}", requestURI);
-
-        // Skip filtering for public paths like Swagger
-        if (isPublicPath(requestURI)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        String username = null;
-        String token = null;
-
-        // Check Authorization header for Bearer token
-        if (requestHeader != null && requestHeader.startsWith(BEARER_PREFIX)) {
-            token = requestHeader.substring(BEARER_PREFIX.length());
-            logger.debug("Extracted token: {}", token);
-
-            try {
-                username = jwtHelper.getUsernameFromToken(token);
-            } catch (Exception e) {
-                logger.error("Error while parsing token", e);
-            }
-        } else {
-            logger.warn("Invalid Authorization header");
-        }
-
-        // Validate the token and set authentication
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-            if (jwtHelper.validateToken(token, userDetails)) {
-                List<GrantedAuthority> authorities = jwtHelper.getRolesFromToken(token).stream()
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-
-                logger.info("Authenticated user: {} with roles: {}", username, authorities);
-
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
-                logger.warn("Token validation failed for user: {}. Token: {}", username, token);
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Invalid or expired token");
-                response.getWriter().flush();
-                return;
-            }
-        }
-
-        filterChain.doFilter(request, response);
-    }
-
-
- */
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
