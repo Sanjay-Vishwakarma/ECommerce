@@ -16,6 +16,26 @@ public class CategoryController {
     private CategoryService categoryService;
 
 
+    @PostMapping("/addCategory")
+    Response<CategoryDto> addCategory(@RequestBody CategoryDto categoryDto) {
+        return categoryService.addCategory(categoryDto);
+    }
+
+    @GetMapping("/getCategoryById/{categoryId}")
+    Response<CategoryDto> getCategoryById(@PathVariable String categoryId) {
+        return categoryService.getCategoryById(categoryId);
+    }
+
+    @PutMapping("/updateCategory/{categoryId}")
+    Response<CategoryDto> updateCategory(@RequestBody CategoryDto categoryDto, @PathVariable String categoryId) {
+        return categoryService.updateCategory(categoryDto, categoryId);
+    }
+
+    @DeleteMapping("/categories/deleteCategory/{categoryId}")
+    Response<String> deleteCategory(@PathVariable String categoryId) {
+        return categoryService.deleteCategory(categoryId);
+    }
+
     @GetMapping("/getAllCatogories")
     PageableResponse<CategoryDto> getAllCategories(
             @RequestParam(value = "pageNumber", defaultValue = "1", required = false) int pageNumber,
@@ -25,11 +45,5 @@ public class CategoryController {
     ) {
         return categoryService.getAllCategories(pageNumber, pageSize, sortBy, sortDir);
     }
-
-    @GetMapping("/getCategoryById/{categoryId}")
-    Response<CategoryDto> getCategoryById(@PathVariable String categoryId) {
-        return categoryService.getCategoryById(categoryId);
-    }
-
 
 }

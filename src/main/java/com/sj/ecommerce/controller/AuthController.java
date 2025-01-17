@@ -2,6 +2,7 @@ package com.sj.ecommerce.controller;
 
 
 //import io.swagger.annotations.Api;
+
 import com.sj.ecommerce.dto.*;
 import com.sj.ecommerce.entity.User;
 import com.sj.ecommerce.exceptions.BadApiRequestException;
@@ -23,18 +24,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+
 import java.security.Principal;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
 @Api(value = "AuthController", description = "APIs for Authentication!!")
-//@CrossOrigin(
-//        origins = "http://localhost:4200",
-//        allowedHeaders = {"Authorization"},
-//        methods = {RequestMethod.GET,RequestMethod.POST},
-//        maxAge = 3600
-//)
 public class AuthController {
 
     @Autowired
@@ -52,43 +48,6 @@ public class AuthController {
     private UserRepository userRepository;
 
     private Logger logger = LoggerFactory.getLogger(AuthController.class);
-
-
-//    @Value("${googleClientId}")
-//    private String googleClientId;
-//    @Value("${newPassword}")
-//    private String newPassword;
-
-    /*
-    @PostMapping("/login")
-    public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest request) {
-        this.doAuthenticate(request.getEmail(), request.getPassword());
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
-        String token = this.helper.generateToken(userDetails);
-        UserDto userDto = modelMapper.map(userDetails, UserDto.class);
-        JwtResponse response = JwtResponse.builder()
-                .jwtToken(token)
-                .user(userDto).build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    */
-
-    /*
-    @PostMapping("/login")
-    public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest request) {
-        this.doAuthenticate(request.getEmail(), request.getPassword());
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
-        System.out.println("userDetails = " + userDetails);
-        String token = this.helper.generateToken(userDetails);
-        UserDto userDto = modelMapper.map(userDetails, UserDto.class);
-        JwtResponse response = JwtResponse.builder()
-                .jwtToken(token)
-                .user(userDto).build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-*/
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest request) {
@@ -141,65 +100,5 @@ public class AuthController {
         return new ResponseEntity<>(modelMapper.map(userDetailsService.loadUserByUsername(name), UserDto.class), HttpStatus.OK);
     }
 
-
-
-
-/*
-    @PostMapping("/google")
-    public ResponseEntity<JwtResponse> loginWithGoogle(@RequestBody Map<String, Object> data) throws IOException {
-
-
-        //get the id token from request
-        String idToken = data.get("idToken").toString();
-
-        NetHttpTransport netHttpTransport = new NetHttpTransport();
-
-        JacksonFactory jacksonFactory = JacksonFactory.getDefaultInstance();
-
-        GoogleIdTokenVerifier.Builder verifier = new GoogleIdTokenVerifier.Builder(netHttpTransport, jacksonFactory).setAudience(Collections.singleton(googleClientId));
-
-
-        GoogleIdToken googleIdToken = GoogleIdToken.parse(verifier.getJsonFactory(), idToken);
-
-
-        GoogleIdToken.Payload payload = googleIdToken.getPayload();
-
-        logger.info("Payload : {}", payload);
-
-        String email = payload.getEmail();
-
-        User user = null;
-
-        user = userService.findUserByEmailOptional(email).orElse(null);
-
-        if (user == null) {
-            //create new user
-            user = this.saveUser(email, data.get("name").toString(), data.get("photoUrl").toString());
-        }
-        ResponseEntity<JwtResponse> jwtResponseResponseEntity = this.login(JwtRequest.builder().email(user.getEmail()).password(newPassword).build());
-        return jwtResponseResponseEntity;
-
-
-    }
-
-    private User saveUser(String email, String name, String photoUrl) {
-
-        UserDto newUser = UserDto.builder()
-                .name(name)
-                .email(email)
-                .password(newPassword)
-                .imageName(photoUrl)
-                .roles(new HashSet<>())
-                .build();
-
-        UserDto user = userService.createUser(newUser);
-
-        return this.modelMapper.map(user, User.class);
-
-
-    }
-
-
- */
 
 }

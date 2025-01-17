@@ -1,5 +1,6 @@
 package com.sj.ecommerce.security;
 
+import com.sj.ecommerce.common.ConstentMessage;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +17,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,8 +25,6 @@ import java.util.stream.Collectors;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
-    private static final String AUTH_HEADER = "Authorization";
-    private static final String BEARER_PREFIX = "Bearer ";
 
     @Autowired
     private JwtHelper jwtHelper;
@@ -49,12 +47,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // Existing token validation logic...
-        String requestHeader = request.getHeader(AUTH_HEADER);
+        String requestHeader = request.getHeader(ConstentMessage.AUTH_HEADER);
         String username = null;
         String token = null;
 
-        if (requestHeader != null && requestHeader.startsWith(BEARER_PREFIX)) {
-            token = requestHeader.substring(BEARER_PREFIX.length());
+        if (requestHeader != null && requestHeader.startsWith(ConstentMessage.BEARER_PREFIX)) {
+            token = requestHeader.substring(ConstentMessage.BEARER_PREFIX.length());
             logger.debug("Extracted token: {}", token);
 
             try {
