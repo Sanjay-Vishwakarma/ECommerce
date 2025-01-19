@@ -20,6 +20,7 @@ public class JwtHelper {
 
     // Token validity in seconds (5 hours)
     public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+    public static final long REFRESH_TOKEN_VALIDITY = 7 * 24 * 60 * 60; // Refresh token validity: 7 days
 
     // Secret key from application properties
     @Value("${jwt.secret}")
@@ -90,5 +91,38 @@ public class JwtHelper {
         final String username = getUsernameFromToken(token);
         System.out.println("username validateToken = " + username);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+
+    // Generate Refresh Token
+    public String generateRefreshToken(UserDetails userDetails) {
+        return Jwts.builder()
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY * 1000))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS512)
+                .compact();
+    }
+
+    // Validate Refresh Token
+    public boolean validateRefreshToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    // Extract username from Refresh Token
+    public String getUsernameFromRefreshToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 }

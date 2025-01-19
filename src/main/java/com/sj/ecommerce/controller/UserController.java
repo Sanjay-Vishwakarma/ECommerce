@@ -41,12 +41,13 @@ public class UserController {
     }
 
     // 4. Update User Profile
-    @PutMapping("/profile/update/{getUserById}")
+    @PutMapping("/profileUpdate/{getUserById}")
     public Response<UserDto> updateUserProfile(@PathVariable String getUserById, @RequestBody UserDto userDTO) {
         return userService.updateUserProfile(getUserById, userDTO);
     }
 
     // admin
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{userId}")
     Response<String> deleteUser(@PathVariable String userId) {
         return userService.deleteUser(userId);

@@ -5,6 +5,7 @@ import com.sj.ecommerce.dto.PageableResponse;
 import com.sj.ecommerce.dto.Response;
 import com.sj.ecommerce.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -18,12 +19,14 @@ public class InventoryController {
 
 
     // Add inventory
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/addProduct")
     public Response<InventoryDto> addInventory(@RequestBody InventoryDto inventoryDto) {
         return inventoryService.addInventory(inventoryDto);
     }
 
     // Update inventory stock
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{productId}")
     public Response<InventoryDto> updateInventoryStock(
             @PathVariable String productId, @RequestBody InventoryDto inventoryDto) {
@@ -31,6 +34,7 @@ public class InventoryController {
     }
 
     // Delete inventory
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{productId}")
     public Response<String> deleteInventory(@PathVariable String productId) {
         return inventoryService.deleteInventory(productId);

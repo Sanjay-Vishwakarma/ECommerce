@@ -9,12 +9,12 @@ import com.sj.ecommerce.exceptions.BadApiRequestException;
 import com.sj.ecommerce.repository.UserRepository;
 import com.sj.ecommerce.security.JwtHelper;
 import com.sj.ecommerce.service.UserService;
+import com.sj.ecommerce.serviceImpl.TokenBlacklistService;
 import io.swagger.annotations.Api;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +26,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -40,9 +42,11 @@ public class AuthController {
     @Autowired
     private AuthenticationManager manager;
     @Autowired
-    private UserService userService;
-    @Autowired
     private JwtHelper helper;
+
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
+
 
     @Autowired
     private UserRepository userRepository;
@@ -60,6 +64,7 @@ public class AuthController {
 
         // Generate JWT token
         String token = this.helper.generateToken(userDetails);
+        String refreshToken = this.helper.generateRefreshToken(userDetails);
 
         // Retrieve user from the database
         User user = userRepository.findByEmail(request.getEmail())
@@ -78,6 +83,7 @@ public class AuthController {
         // Create the JWT response
         JwtResponse response = JwtResponse.builder()
                 .jwtToken(token)
+                .refreshToken(refreshToken)
                 .user(userDto)
                 .build();
 
@@ -94,11 +100,58 @@ public class AuthController {
         }
     }
 
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshAccessToken(@RequestBody Map<String, String> request) {
+        String refreshToken = request.get("refreshToken");
+
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            return ResponseEntity.badRequest().body("Refresh token is required");
+        }
+
+        // Validate the refresh token
+        if (!helper.validateRefreshToken(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired refresh token");
+        }
+
+        // Extract the username from the refresh token
+        String username = helper.getUsernameFromRefreshToken(refreshToken);
+
+        // Load user details and generate a new access token
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        String newAccessToken = helper.generateToken(userDetails);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("accessToken", newAccessToken);
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    // LOGOUT API
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
+        // Check if the token is present in the Authorization header
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or missing Authorization header");
+        }
+
+        // Extract the token
+        String token = authHeader.substring(7);
+
+        // Option 1: If you have a token blacklist mechanism (e.g., database or in-memory list), invalidate it here
+        // Example: Add the token to a blacklist (future requests with this token will be rejected)
+        tokenBlacklistService.addToBlacklist(token);
+
+        // Option 2: If you rely on client-side token removal, simply respond with a success message
+        return ResponseEntity.ok("Logout successful. Please discard your token.");
+    }
+
+
     @GetMapping("/current")
     public ResponseEntity<UserDto> getCurrentUser(Principal principal) {
         String name = principal.getName();
         return new ResponseEntity<>(modelMapper.map(userDetailsService.loadUserByUsername(name), UserDto.class), HttpStatus.OK);
     }
-
 
 }

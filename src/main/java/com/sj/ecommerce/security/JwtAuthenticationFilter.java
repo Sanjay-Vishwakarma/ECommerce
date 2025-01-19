@@ -1,6 +1,7 @@
 package com.sj.ecommerce.security;
 
 import com.sj.ecommerce.common.ConstentMessage;
+import com.sj.ecommerce.serviceImpl.TokenBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,6 +33,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -54,6 +58,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (requestHeader != null && requestHeader.startsWith(ConstentMessage.BEARER_PREFIX)) {
             token = requestHeader.substring(ConstentMessage.BEARER_PREFIX.length());
             logger.debug("Extracted token: {}", token);
+            if (tokenBlacklistService.isBlacklisted(token)) {
+                logger.warn("Token is blacklisted: {}", token);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token is blacklisted");
+                response.getWriter().flush();
+                return;
+            }
 
             try {
                 username = jwtHelper.getUsernameFromToken(token);
