@@ -6,6 +6,7 @@ import com.sj.ecommerce.dto.PageableResponse;
 import com.sj.ecommerce.dto.Response;
 import com.sj.ecommerce.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,6 +17,7 @@ public class CategoryController {
     private CategoryService categoryService;
 
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/addCategory")
     Response<CategoryDto> addCategory(@RequestBody CategoryDto categoryDto) {
         return categoryService.addCategory(categoryDto);
@@ -26,12 +28,14 @@ public class CategoryController {
         return categoryService.getCategoryById(categoryId);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/updateCategory/{categoryId}")
     Response<CategoryDto> updateCategory(@RequestBody CategoryDto categoryDto, @PathVariable String categoryId) {
         return categoryService.updateCategory(categoryDto, categoryId);
     }
 
-    @DeleteMapping("/categories/deleteCategory/{categoryId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/deleteCategory/{categoryId}")
     Response<String> deleteCategory(@PathVariable String categoryId) {
         return categoryService.deleteCategory(categoryId);
     }

@@ -8,6 +8,7 @@ import com.sj.ecommerce.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -50,6 +51,7 @@ public class OrderController {
     }
 
     // Update order status
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{orderId}")
     public Response<OrderDto> updateOrderStatus(@PathVariable String orderId, @RequestParam String status) {
         return orderService.updateOrderStatus(orderId, status);
@@ -64,6 +66,7 @@ public class OrderController {
 
 
     // Delete an order
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{orderId}")
     public Response<String> deleteOrder(@PathVariable String orderId) {
         return orderService.deleteOrder(orderId);
@@ -71,6 +74,7 @@ public class OrderController {
 
 
     // Get all orders - admin
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getAllOrders")
     public PageableResponse<OrderDto> getAllOrders(
             @RequestParam(value = "pageNumber", defaultValue = "1", required = false) int pageNumber,

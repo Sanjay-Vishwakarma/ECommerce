@@ -10,5 +10,7 @@ import lombok.*;
 @ToString
 public class JwtResponse {
     private String jwtToken;
+    private String refreshToken; // New field for refresh token
     private UserDto user;
+
 }
